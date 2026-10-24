@@ -1,17 +1,7 @@
 import os
-from flask import Flask
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-import threading
 
-# إعداد خادم الويب لاستيفاء شروط Render
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Bot is active and running 24/7!"
-
-# إعداد التوكن والبوت
 TOKEN = os.getenv('BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
 
@@ -56,7 +46,7 @@ def callback_handler(call):
     elif call.data == "most_available":
         text = "🎳 **الخدمات الأكثر توفراً:** الأرقام وخدمات الرشق الأكثر طلباً."
     elif call.data == "boosting_services":
-        text = "🔭 **قسم خدمات الرشق الشامل:** متابعين، لايكات، مشاهدات لكل المنصات."
+    text = "🔭 **قسم خدمات الرشق الشامل:** متابعين، لايكات، مشاهدات لكل المنصات."
     elif call.data == "free_balance":
         text = "💎 **ربح الأرصدة مجاناً:** تابع القناة للحصول على أكواد وهدايا."
     elif call.data == "support":
@@ -71,16 +61,6 @@ def callback_handler(call):
     bot.answer_callback_query(call.id)
     bot.send_message(call.message.chat.id, text, parse_mode="Markdown")
 
-# دالة لتشغيل البوت في الخلفية
-def run_bot():
-    bot.infinity_polling(none_stop=True)
-
 if __name__ == '__main__':
-    # تشغيل البوت بخيط مستقل
-    t = threading.Thread(target=run_bot)
-    t.daemon = True
-    t.start()
-    
-    # تشغيل خادم الويب لفتح البورت المطلوب على Render
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
+    print("Bot is running...")
+    bot.infinity_polling(none_stop=True)
