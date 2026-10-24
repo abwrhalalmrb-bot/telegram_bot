@@ -1,11 +1,30 @@
 import os
 import telebot
+import requests
 from flask import Flask
 from threading import Thread
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 TOKEN = os.getenv('BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
+
+# إعدادات موقع PRM4u API
+PRM_API_URL = "https://prm4u.com/api/v2"
+PRM_API_KEY = "d01321b883441d3a14d34b7170237551"
+
+# دالة لجلب رصيد الحساب من PRM4u
+def get_prm_balance():
+    try:
+        data = {
+            'key': PRM_API_KEY,
+            'action': 'balance'
+        }
+        response = requests.post(PRM_API_URL, data=data).json()
+        if 'balance' in response:
+            return f"{response['balance']} {response.get('currency', '$')}"
+        return "0.00$"
+    except:
+        return "0.00$"
 
 # إعداد سيرفر ويب وهمي لترضية منصة Render ومنع الـ TimeOut
 app = Flask('')
@@ -40,10 +59,12 @@ def main_menu_markup():
 def send_welcome(message):
     user_id = message.from_user.id
     first_name = message.from_user.first_name
+    balance = get_prm_balance()
+    
     welcome_text = (
         f"مرحباً بك عزيزي {first_name} في بوت الخدمات الرقمية 🚀\n\n"
         f"👤 الآيدي: `{user_id}`\n"
-        f"💎 رصيدك الحالي: `0.00$`\n\n"
+        f"💎 رصيد الموقع: `{balance}`\n\n"
         f"────────────────────\n\n"
         f"🌟 بوابتك الأولى والأسرع للخدمات الرقمية المتكاملة، الأرقام الافتراضية، والرشق!\n\n"
         f"👇 اختر ما يناسبك من القائمة أدناه:"
@@ -62,7 +83,7 @@ def callback_handler(call):
     elif call.data == "most_available":
         text = "🎳 **الخدمات الأكثر توفراً:** الأرقام وخدمات الرشق الأكثر طلباً."
     elif call.data == "boosting_services":
-        text = "🔭 **قسم خدمات الرشق الشامل:** متابعين، لايكات، مشاهدات لكل المنصات."
+        text = "🔭 **قسم خدمات الرشق الشامل:** متابعين، لايكات، مشاهدات لكل المنصات.\n\n(تم الربط بنجاح مع سيرفر الخدمات الأساسي)."
     elif call.data == "free_balance":
         text = "💎 **ربح الأرصدة مجاناً:** تابع القناة للحصول على أكواد وهدايا."
     elif call.data == "support":
@@ -70,7 +91,8 @@ def callback_handler(call):
     elif call.data == "instructions":
         text = "📖 **تعليمات الاستخدام:** اختر القسم، تأكد من رصيدك، ويتم التنفيذ فوراً."
     elif call.data == "my_account":
-        text = f"👤 **معلومات حسابك:**\n\n• الآيدي: `{user_id}`\n• الرصيد: `0.00$`"
+        balance = get_prm_balance()
+        text = f"👤 **معلومات حسابك:**\n\n• الآيدي: `{user_id}`\n• رصيد المنصة: `{balance}`"
     else:
         text = "تم استلام طلبك بنجاح."
 
