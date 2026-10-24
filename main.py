@@ -1,9 +1,25 @@
 import os
 import telebot
+from flask import Flask
+from threading import Thread
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 TOKEN = os.getenv('BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
+
+# إعداد سيرفر ويب وهمي لترضية منصة Render ومنع الـ TimeOut
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is active and running 24/7!"
+
+def run_web():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run_web)
+    t.start()
 
 def main_menu_markup():
     markup = InlineKeyboardMarkup(row_width=2)
@@ -62,4 +78,5 @@ def callback_handler(call):
     bot.send_message(call.message.chat.id, text, parse_mode="Markdown")
 
 if __name__ == "__main__":
+    keep_alive()
     bot.infinity_polling()
