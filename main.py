@@ -133,27 +133,60 @@ def callback_handler(call):
         bot.edit_message_text(
             chat_id=call.message.chat.id,
             message_id=call.message.message_id,
-            text="🔭 **قسم خدمات الرشق الشامل:**\nاختر المنصة المطلوبة لعرض خدماتها:",
+            text="🔭 **قسم خدمات الرشق الشامل:**\nاختر المنصة المطلوبة لعرض خدماتها بشكل احترافي:",
             reply_markup=boosting_platforms_markup()
         )
     elif call.data.startswith("plat_"):
         platform_name = call.data.replace("plat_", "")
         services = get_prm_services()
         
-        # تصفية الخدمات التي تنتمي للمنصة المختارة
+        # تصفية الخدمات حسب المنصة
         filtered_services = [s for s in services if platform_name.lower() in s.get('category', '').lower() or platform_name.lower() in s.get('name', '').lower()]
         
         if not filtered_services:
-            # إذا لم يتم العثور على مطابقة دقيقة بالاسم، نعرض عينة من الخدمات أو رسالة
-            text = f"📱 **خدمات {platform_name}:**\n\nعفواً، لم يتم العثور على خدمات مباشرة لهذا القسم حالياً أو جارٍ تحديثها."
+            text = f"📱 **خدمات {platform_name}:**\n\nعفواً، لا توجد خدمات متاحة لهذا القسم حالياً."
+            markup = InlineKeyboardMarkup()
+            markup.add(InlineKeyboardButton("🔙 رجوع لأقسام الرشق", callback_data="boosting_services"))
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=markup, parse_mode="Markdown")
         else:
-            text = f"📱 **قائمة خدمات {platform_name} المتاحة:**\n\n"
-            for s in filtered_services[:10]:  # نعرض أول 10 خدمات كمثال حتى لا تكون الرسالة طويلة جداً
-                text += f"🔹 **{s.get('name')}**\n🆔 رقم الخدمة: `{s.get('service')}`\n💰 السعر لكل 1000: `${s.get('rate')}`\n\n"
+            # إنشاء أزرار لكل خدمة على حدة بشكل مرتب واحترافي
+            markup = InlineKeyboardMarkup(row_width=1)
+            for s in filtered_services[:12]:  # نعرض أول 12 خدمة مرتبة كأزرار منفصلة
+                service_id = s.get('service')
+                service_name = s.get('name')
+                # اختصار اسم الخدمة إذا كان طويلاً ليكون الزر منظماً
+                short_name = (service_name[:42] + '..') if len(service_name) > 45 else service_name
+                markup.add(InlineKeyboardButton(f"📌 {short_name}", callback_data=f"srv_{service_id}"))
+            
+            markup.add(InlineKeyboardButton("🔙 رجوع لأقسام الرشق", callback_data="boosting_services"))
+            bot.edit_message_text(
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id,
+                text=f"📱 **اختر الخدمة المطلوبة من قسم {platform_name}:**\nانقر على الخدمة لعرض تفاصيلها وسعرها بدقة.",
+                reply_markup=markup,
+                parse_mode="Markdown"
+            )
+    elif call.data.startswith("srv_"):
+        service_id = call.data.replace("srv_", "")
+        services = get_prm_services()
+        selected_service = next((s for s in services if str(s.get('service')) == service_id), None)
         
+        if selected_service:
+            text = (
+                f"📋 **تفاصيل الخدمة المختارة:**\n\n"
+                f"🔹 **اسم الخدمة:** {selected_service.get('name')}\n"
+                f"🆔 **رقم الخدمة:** `{selected_service.get('service')}`\n"
+                f"💰 **السعر (لكل 1000):** `${selected_service.get('rate')}`\n"
+                f"📉 **الحد الأدنى للطلب:** `{selected_service.get('min')}`\n"
+                f"📈 **الحد الأقصى للطلب:** `{selected_service.get('max')}`\n\n"
+                f"────────────────────\n"
+                f"💡 للطلب، يرجى إرسال رابط المنشور والكمية المطلوبة مباشرة (أو سيتم تفعيل خاصية الطلب المباشر قريباً)."
+            )
+        else:
+            text = "عفواً، لم يتم العثور على تفاصيل هذه الخدمة."
+            
         markup = InlineKeyboardMarkup()
-        markup.add(InlineKeyboardButton("🔙 رجوع لأقسام الرشق", callback_data="boosting_services"))
-        
+        markup.add(InlineKeyboardButton("🔙 رجوع للقائمة", callback_data="boosting_services"))
         bot.edit_message_text(
             chat_id=call.message.chat.id,
             message_id=call.message.message_id,
