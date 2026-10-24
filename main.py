@@ -1,67 +1,39 @@
 import os
-import threading
 from flask import Flask
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+import threading
 
-# 1. إعداد خادم Web مصغر ليعمل مع Render
+# إعداد خادم الويب لاستيفاء شروط Render
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "Bot is Alive and Running 24/7!"
+    return "Bot is active and running 24/7!"
 
-def run_flask():
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
-
-# 2. إعداد البوت وتوكن التليجرام
+# إعداد التوكن والبوت
 TOKEN = os.getenv('BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
 
-# دالة القائمة الرئيسية والأزرار الشفافة
 def main_menu_markup():
     markup = InlineKeyboardMarkup(row_width=2)
-    
     markup.add(InlineKeyboardButton("🛒 شراء رقم افتراضي", callback_data="buy_number"))
-    
     markup.add(
         InlineKeyboardButton("💬 عروض WhatsApp", callback_data="whatsapp_offers"),
         InlineKeyboardButton("✈️ عروض Telegram", callback_data="telegram_offers")
     )
-    
-    markup.add(
-        InlineKeyboardButton("🎳 الأكثر توفراً", callback_data="most_available")
-    )
-    
-    markup.add(
-        InlineKeyboardButton("🔭 الرشق وشحن الألعاب والبرامج", callback_data="boosting_services")
-    )
-    
-    markup.add(
-        InlineKeyboardButton("💎 ربح الأرصدة مجاناً (أكواد وهدايا)", callback_data="free_balance")
-    )
-    
-    markup.add(
-        InlineKeyboardButton("📞 الدعم", callback_data="support")
-    )
-    
-    markup.add(
-        InlineKeyboardButton("📖 تعليمات وطريقة استخدام البوت", callback_data="instructions")
-    )
-    
-    markup.add(
-        InlineKeyboardButton("👤 حسابي", callback_data="my_account")
-    )
-    
+    markup.add(InlineKeyboardButton("🎳 الأكثر توفراً", callback_data="most_available"))
+    markup.add(InlineKeyboardButton("🔭 الرشق وشحن الألعاب والبرامج", callback_data="boosting_services"))
+    markup.add(InlineKeyboardButton("💎 ربح الأرصدة مجاناً (أكواد وهدايا)", callback_data="free_balance"))
+    markup.add(InlineKeyboardButton("📞 الدعم", callback_data="support"))
+    markup.add(InlineKeyboardButton("📖 تعليمات وطريقة استخدام البوت", callback_data="instructions"))
+    markup.add(InlineKeyboardButton("👤 حسابي", callback_data="my_account"))
     return markup
 
-# أمر البدء /start
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     user_id = message.from_user.id
     first_name = message.from_user.first_name
-    
     welcome_text = (
         f"مرحباً بك عزيزي {first_name} في بوت الخدمات الرقمية 🚀\n\n"
         f"👤 الآيدي: `{user_id}`\n"
@@ -70,56 +42,45 @@ def send_welcome(message):
         f"🌟 بوابتك الأولى والأسرع للخدمات الرقمية المتكاملة، الأرقام الافتراضية، والرشق!\n\n"
         f"👇 اختر ما يناسبك من القائمة أدناه:"
     )
-    
-    bot.send_message(
-        message.chat.id,
-        welcome_text,
-        reply_markup=main_menu_markup(),
-        parse_mode="Markdown"
-    )
+    bot.send_message(message.chat.id, welcome_text, reply_markup=main_menu_markup(), parse_mode="Markdown")
 
-# التعامل مع الضغط على الأزرار
 @bot.callback_query_handler(func=lambda call: True)
 def callback_handler(call):
     user_id = call.from_user.id
-    
     if call.data == "buy_number":
-        text = (
-            "🌐 **قسم شراء الأرقام الوهمية (جميع دول العالم متاحة):**\n\n"
-            "اختر التطبيق المطلوب لتفعيل رقم وهمي:\n"
-            "• واتساب، تيليجرام، انستقرام، فيسبوك، تيك توك، جميع التطبيقات الأخرى.\n\n"
-            "*(الرجاء اختيار الدولة والتطبيق من القائمة الفرعية)*"
-        )
+        text = "🌐 **قسم شراء الأرقام الوهمية (جميع دول العالم متاحة):**\n\nاختر التطبيق المطلوب لتفعيل رقم وهمي."
     elif call.data == "whatsapp_offers":
-        text = "💬 **عروض WhatsApp:**\nأرقام قوية وثابتة لتفعيل تطبيق واتساب وبزنس بضمان كامل."
+        text = "💬 **عروض WhatsApp:** أرقام قوية وثابتة لتفعيل واتساب."
     elif call.data == "telegram_offers":
-        text = "✈️ **عروض Telegram:**\nأرقام مميزة لتفعيل حسابات تيليجرام جاهزة ومضمونة."
+        text = "✈️ **عروض Telegram:** أرقام مميزة لتفعيل تيليجرام."
     elif call.data == "most_available":
-        text = "🎳 **الخدمات الأكثر توفراً وطلباً حالياً:**\nتضم الأرقام الأكثر استقراراً وخدمات الرشق السريعة."
+        text = "🎳 **الخدمات الأكثر توفراً:** الأرقام وخدمات الرشق الأكثر طلباً."
     elif call.data == "boosting_services":
-        text = (
-            "🔭 **قسم خدمات الرشق الشامل لجميع مواقع التواصل الاجتماعي:**\n\n"
-            "• زيادة متابعين (انستقرام، تيك توك، تويتر/X، يوتيوب، سناب شات).\n"
-            "• زيادة لايكات، مشاهدات، وتعليقات.\n"
-            "• شحن شدات وجواهر الألعاب والبرامج.\n\n"
-            "*(جميع خدمات الرشق تتميز بالسرعة والضمان)*"
-        )
+        text = "🔭 **قسم خدمات الرشق الشامل:** متابعين، لايكات، مشاهدات لكل المنصات."
     elif call.data == "free_balance":
-        text = "💎 **ربح الأرصدة مجاناً:**\nتابع قناة البوت يومياً للحصول على أكواد وهدايا رصيد مجانية!"
+        text = "💎 **ربح الأرصدة مجاناً:** تابع القناة للحصول على أكواد وهدايا."
     elif call.data == "support":
-        text = "📞 **الدعم الفني:**\nللتواصل مع الإدارة وحل أي مشكلة تواجهك: @Support_Admin"
+        text = "📞 **الدعم الفني:** للتواصل مع الإدارة: @Support_Admin"
     elif call.data == "instructions":
-        text = "📖 **تعليمات وطريقة استخدام البوت:**\n1. اختر القسم المناسب.\n2. تأكد من توفر رصيد أو اطلب رصيد مجاني.\n3. تنفيذ الخدمة يتم بشكل فوري وآلي."
+        text = "📖 **تعليمات الاستخدام:** اختر القسم، تأكد من رصيدك، ويتم التنفيذ فوراً."
     elif call.data == "my_account":
-        text = f"👤 **معلومات حسابك:**\n\n• الآيدي: `{user_id}`\n• الرصيد: `0.00$`\n• الطلبات المكتملة: `0`"
+        text = f"👤 **معلومات حسابك:**\n\n• الآيدي: `{user_id}`\n• الرصيد: `0.00$`"
     else:
         text = "تم استلام طلبك بنجاح."
 
     bot.answer_callback_query(call.id)
     bot.send_message(call.message.chat.id, text, parse_mode="Markdown")
 
-# تشغيل الخادم والبوت في مسارات مستقلة
+# دالة لتشغيل البوت في الخلفية
+def run_bot():
+    bot.infinity_polling(none_stop=True)
+
 if __name__ == '__main__':
-    threading.Thread(target=run_flask).start()
-    print("Bot is running...")
-    bot.infinity_polling()
+    # تشغيل البوت بخيط مستقل
+    t = threading.Thread(target=run_bot)
+    t.daemon = True
+    t.start()
+    
+    # تشغيل خادم الويب لفتح البورت المطلوب على Render
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
