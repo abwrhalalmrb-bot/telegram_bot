@@ -26,6 +26,18 @@ def get_prm_balance():
     except:
         return "0.00$"
 
+# دالة لجلب قائمة الخدمات من PRM4u
+def get_prm_services():
+    try:
+        data = {
+            'key': PRM_API_KEY,
+            'action': 'services'
+        }
+        response = requests.post(PRM_API_URL, data=data).json()
+        return response if isinstance(response, list) else []
+    except:
+        return []
+
 # إعداد سيرفر ويب وهمي لمنع الـ TimeOut على Render
 app = Flask('')
 
@@ -60,16 +72,16 @@ def main_menu_markup():
 def boosting_platforms_markup():
     markup = InlineKeyboardMarkup(row_width=2)
     markup.add(
-        InlineKeyboardButton("📸 Instagram", callback_data="plat_instagram"),
-        InlineKeyboardButton("🎵 TikTok", callback_data="plat_tiktok")
+        InlineKeyboardButton("📸 Instagram", callback_data="plat_Instagram"),
+        InlineKeyboardButton("🎵 TikTok", callback_data="plat_TikTok")
     )
     markup.add(
-        InlineKeyboardButton("✈️ Telegram", callback_data="plat_telegram"),
-        InlineKeyboardButton("▶️ YouTube", callback_data="plat_youtube")
+        InlineKeyboardButton("✈️ Telegram", callback_data="plat_Telegram"),
+        InlineKeyboardButton("▶️ YouTube", callback_data="plat_YouTube")
     )
     markup.add(
-        InlineKeyboardButton("📘 Facebook", callback_data="plat_facebook"),
-        InlineKeyboardButton("🐦 Twitter (X)", callback_data="plat_twitter")
+        InlineKeyboardButton("📘 Facebook", callback_data="plat_Facebook"),
+        InlineKeyboardButton("🐦 Twitter", callback_data="plat_Twitter")
     )
     markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
     return markup
@@ -102,7 +114,7 @@ def callback_handler(call):
             reply_markup=main_menu_markup()
         )
     elif call.data == "buy_number":
-        text = "🌐 **قسم شراء الأرقام الوهمية (جميع دول العالم متاحة):**\n\nاختر التطبيق المطلوب لتفعيل رقم وهمي."
+        text = "🌐 **قسم شراء الأرقام الوهمية:**\n\nاختر التطبيق المطلوب لتفعيل رقم وهمي."
         bot.answer_callback_query(call.id)
         bot.send_message(call.message.chat.id, text, parse_mode="Markdown")
     elif call.data == "whatsapp_offers":
@@ -125,10 +137,23 @@ def callback_handler(call):
             reply_markup=boosting_platforms_markup()
         )
     elif call.data.startswith("plat_"):
-        platform = call.data.replace("plat_", "").capitalize()
-        text = f"📱 **خدمات {platform}:**\n\nتم ربط القسم بنجاح. سيتم جلب قائمة الخدمات الخاصة بـ {platform} وعرضها هنا قريباً لتختار منها مباشرة."
+        platform_name = call.data.replace("plat_", "")
+        services = get_prm_services()
+        
+        # تصفية الخدمات التي تنتمي للمنصة المختارة
+        filtered_services = [s for s in services if platform_name.lower() in s.get('category', '').lower() or platform_name.lower() in s.get('name', '').lower()]
+        
+        if not filtered_services:
+            # إذا لم يتم العثور على مطابقة دقيقة بالاسم، نعرض عينة من الخدمات أو رسالة
+            text = f"📱 **خدمات {platform_name}:**\n\nعفواً، لم يتم العثور على خدمات مباشرة لهذا القسم حالياً أو جارٍ تحديثها."
+        else:
+            text = f"📱 **قائمة خدمات {platform_name} المتاحة:**\n\n"
+            for s in filtered_services[:10]:  # نعرض أول 10 خدمات كمثال حتى لا تكون الرسالة طويلة جداً
+                text += f"🔹 **{s.get('name')}**\n🆔 رقم الخدمة: `{s.get('service')}`\n💰 السعر لكل 1000: `${s.get('rate')}`\n\n"
+        
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("🔙 رجوع لأقسام الرشق", callback_data="boosting_services"))
+        
         bot.edit_message_text(
             chat_id=call.message.chat.id,
             message_id=call.message.message_id,
