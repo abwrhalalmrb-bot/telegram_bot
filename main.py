@@ -82,7 +82,6 @@ def send_welcome(message):
     user_id = message.from_user.id
     first_name = message.from_user.first_name
     
-    # التأكد من تسجيل المستخدم في القاعدة
     users = load_users()
     if str(user_id) not in users:
         users[str(user_id)] = {'balance': 0.0, 'name': first_name}
@@ -113,9 +112,8 @@ def handle_add_balance(message):
         add_user_balance(target_id, amount)
         new_balance = get_user_balance(target_id)
         
-        bot.reply_to(message, f"✅ تم إشعار وتزويد الحساب برصيد!\n\n🆔 المستخدم: `{target_id}`\n➕ المبلغ المضاف: `${amount}`\n💰 الرصيد الجديد: `${new_balance:.2f}`", parse_mode="Markdown")
+        bot.reply_to(message, f"✅ تم تزويد الحساب برصيد بنجاح!\n\n🆔 المستخدم: `{target_id}`\n➕ المبلغ المضاف: `${amount}`\n💰 الرصيد الجديد: `${new_balance:.2f}`", parse_mode="Markdown")
         
-        # إشعار المستخدم تلقائياً
         try:
             bot.send_message(target_id, f"🎉 **تم شحن حسابك بنجاح!**\n\n➕ المبلغ المضاف: `${amount}`\n💰 رصيدك الحالي: `${new_balance:.2f}`", parse_mode="Markdown")
         except:
@@ -127,6 +125,9 @@ def handle_add_balance(message):
 def callback_handler(call):
     user_id = call.from_user.id
     balance = get_user_balance(user_id)
+    
+    # إلغاء علامة التحميل من الزر لكي يستجيب فوراً
+    bot.answer_callback_query(call.id)
     
     if call.data == "main_menu":
         bot.edit_message_text(
@@ -169,8 +170,7 @@ def callback_handler(call):
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text, reply_markup=markup, parse_mode="Markdown")
 
     elif call.data in ["buy_number", "whatsapp_offers", "telegram_offers", "support", "instructions"]:
-        text = f"تم اختيار: {call.data}. قسم قيد التجهيز وربط الأرصدة."
-        bot.answer_callback_query(call.id)
+        text = f"تم اختيار القسم بنجاح. قيد التجهيز والتحديث."
         bot.send_message(call.message.chat.id, text)
 
 if __name__ == "__main__":
