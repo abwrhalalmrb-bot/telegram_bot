@@ -46,7 +46,7 @@ def callback_handler(call):
     elif call.data == "most_available":
         text = "🎳 **الخدمات الأكثر توفراً:** الأرقام وخدمات الرشق الأكثر طلباً."
     elif call.data == "boosting_services":
-    text = "🔭 **قسم خدمات الرشق الشامل:** متابعين، لايكات، مشاهدات لكل المنصات."
+        text = "🔭 **قسم خدمات الرشق الشامل:** متابعين، لايكات، مشاهدات لكل المنصات."
     elif call.data == "free_balance":
         text = "💎 **ربح الأرصدة مجاناً:** تابع القناة للحصول على أكواد وهدايا."
     elif call.data == "support":
@@ -58,4 +58,8 @@ def callback_handler(call):
     else:
         text = "تم استلام طلبك بنجاح."
 
-    bot.answer_c
+    bot.answer_callback_query(call.id)
+    bot.send_message(call.message.chat.id, text, parse_mode="Markdown")
+
+if __name__ == "__main__":
+    bot.infinity_polling()
