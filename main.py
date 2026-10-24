@@ -58,9 +58,4 @@ def callback_handler(call):
     else:
         text = "تم استلام طلبك بنجاح."
 
-    bot.answer_callback_query(call.id)
-    bot.send_message(call.message.chat.id, text, parse_mode="Markdown")
-
-if __name__ == '__main__':
-    print("Bot is running...")
-    bot.infinity_polling(none_stop=True)
+    bot.answer_c
