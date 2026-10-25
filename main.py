@@ -1,8 +1,8 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# توكن البوت الخاص بك
-TOKEN = "7953256087:AAEIW9d8-G5hJp8rJ2fG9x7W3Z4K2L1M0nQ"
+# التوكن الجديد المدمج بنجاح
+TOKEN = "8708102287:AAH2BvgdCgqfV6Nl9dJ6X19EY0XCR5V_AYk"
 ADMIN_ID = 6815376911
 ADMIN_NAME = "اكرم Mohammed Hassan Al-Matari"
 JEEB_WALLET = "780089588"
