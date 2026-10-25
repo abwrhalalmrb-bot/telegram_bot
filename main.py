@@ -1,7 +1,7 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# إعدادات البوت الأساسية
+# توكن البوت الخاص بك
 TOKEN = "7953256087:AAEIW9d8-G5hJp8rJ2fG9x7W3Z4K2L1M0nQ"
 ADMIN_ID = 6815376911
 ADMIN_NAME = "اكرم Mohammed Hassan Al-Matari"
@@ -112,5 +112,5 @@ def handle_query(call):
         bot.edit_message_text("مرحباً بك مرة أخرى في القائمة الرئيسية:", call.message.chat.id, call.message.message_id, reply_markup=markup)
 
 if __name__ == '__main__':
-    print("Bot is starting...")
-    bot.infinity_polling()
+    print("Bot is starting successfully...")
+    bot.infinity_polling(none_stop=True)
