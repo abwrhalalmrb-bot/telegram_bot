@@ -1,9 +1,5 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-import requests
-import os
-from flask import Flask
-from threading import Thread
 
 # إعدادات البوت الأساسية
 TOKEN = "7953256087:AAEIW9d8-G5hJp8rJ2fG9x7W3Z4K2L1M0nQ"
@@ -11,25 +7,7 @@ ADMIN_ID = 6815376911
 ADMIN_NAME = "اكرم Mohammed Hassan Al-Matari"
 JEEB_WALLET = "780089588"
 
-# إعدادات موقع SMM Panel (تم دمج مفتاحك ورابط الـ API بنجاح)
-SMM_API_URL = "https://my.smm-panel.com/api/v2"
-SMM_API_KEY = "********************************"
-
 bot = telebot.TeleBot(TOKEN)
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Bot is running 24/7!"
-
-def run():
-    app.run(host='0.0.0.0', port=8080)
-
-def keep_alive():
-    t = Thread(target=run)
-    t.start()
-
-# قاعدة بيانات مؤقتة لتخزين الأرصدة والطلبات
 user_balances = {}
 
 def get_balance(user_id):
@@ -38,28 +16,11 @@ def get_balance(user_id):
 def update_balance(user_id, amount):
     user_balances[user_id] = get_balance(user_id) + amount
 
-# دالة إرسال الطلب تلقائياً إلى موقع SMM Panel
-def send_order_to_smm(service_id, link, quantity):
-    data = {
-        'key': ********************************
-,
-        'action': 'add',
-        'service': service_id,
-        'link': link,
-        'quantity': quantity
-    }
-    try:
-        response = requests.post(SMM_API_URL, data=data)
-        return response.json()
-    except Exception as e:
-        return {'error': str(e)}
-
-# واجهة القائمة الرئيسية
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     markup = InlineKeyboardMarkup(row_width=2)
     markup.add(
-        InlineKeyboardButton("🛒 خدمات الرشق (عربي وأجنبي)", callback_data="services"),
+        InlineKeyboardButton("🛒 خدمات الرشق", callback_data="services"),
         InlineKeyboardButton("💰 محفظتي وشحن الرصيد", callback_data="wallet")
     )
     markup.add(
@@ -68,13 +29,12 @@ def send_welcome(message):
     )
     bot.send_message(
         message.chat.id,
-        f"مرحباً بك يا غالي في بوت الخدمات الرقمية والرشـق التلقائي 🚀\n\n"
+        f"مرحباً بك يا غالي في بوت الخدمات الرقمية والرشـق 🚀\n\n"
         f"🔹 الإدارة: {ADMIN_NAME}\n"
         f"🔹 اختر ما يناسبك من القائمة أدناه:",
         reply_markup=markup
     )
 
-# لوحة التحكم الخاصة بالإدارة لشحن الرصيد
 @bot.message_handler(commands=['addbalance'])
 def add_balance_cmd(message):
     if message.from_user.id != ADMIN_ID:
@@ -130,19 +90,19 @@ def handle_query(call):
     elif call.data == "services":
         markup = InlineKeyboardMarkup()
         markup.add(
-            InlineKeyboardButton("📸 انستجرام (عربي/أجنبي)", callback_data="cat_insta"),
-            InlineKeyboardButton("🎵 تيك توك (تفاعل/متابعين)", callback_data="cat_tiktok")
+            InlineKeyboardButton("📸 انستجرام", callback_data="cat_insta"),
+            InlineKeyboardButton("🎵 تيك توك", callback_data="cat_tiktok")
         )
         markup.add(
-            InlineKeyboardButton("✈️ تيليجرام (أعضاء/مشاهدات)", callback_data="cat_tele"),
+            InlineKeyboardButton("✈️ تيليجرام", callback_data="cat_tele"),
             InlineKeyboardButton("🔙 رجوع", callback_data="main_menu")
         )
-        bot.edit_message_text("اختر القسم المطلوب لخدمات الرشق الآلي:", call.message.chat.id, call.message.message_id, reply_markup=markup)
+        bot.edit_message_text("اختر القسم المطلوب:", call.message.chat.id, call.message.message_id, reply_markup=markup)
 
     elif call.data == "main_menu":
         markup = InlineKeyboardMarkup(row_width=2)
         markup.add(
-            InlineKeyboardButton("🛒 خدمات الرشق (عربي وأجنبي)", callback_data="services"),
+            InlineKeyboardButton("🛒 خدمات الرشق", callback_data="services"),
             InlineKeyboardButton("💰 محفظتي وشحن الرصيد", callback_data="wallet")
         )
         markup.add(
@@ -152,5 +112,5 @@ def handle_query(call):
         bot.edit_message_text("مرحباً بك مرة أخرى في القائمة الرئيسية:", call.message.chat.id, call.message.message_id, reply_markup=markup)
 
 if __name__ == '__main__':
-    keep_alive()
+    print("Bot is starting...")
     bot.infinity_polling()
