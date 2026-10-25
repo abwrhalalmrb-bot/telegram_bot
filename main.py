@@ -41,7 +41,8 @@ def update_balance(user_id, amount):
 # دالة إرسال الطلب تلقائياً إلى موقع SMM Panel
 def send_order_to_smm(service_id, link, quantity):
     data = {
-        'key': SMM_API_KEY,
+        'key': ********************************
+,
         'action': 'add',
         'service': service_id,
         'link': link,
