@@ -1,6 +1,9 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import time
+import os
+from flask import Flask
+from threading import Thread
 
 # إعدادات البوت والتوكن الخاص بك
 TOKEN = "8708102287:AAHavoWuCttSxEhhwQd1TMFN4nX_DdAwSE8"
@@ -11,6 +14,17 @@ ADMIN_USERNAME = "A_M_Almatari"
 
 bot = telebot.TeleBot(TOKEN)
 user_balances = {}
+
+# إنشاء خفيف جداً لفتح بورت لترضى عنه منصة Render وتظهر العلامة الزرقاء
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot is running and active!"
+
+def run_web():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
 
 def get_balance(user_id):
     return user_balances.get(user_id, 0.0)
@@ -176,7 +190,11 @@ def handle_query(call):
         )
 
 if __name__ == '__main__':
-    print("Bot is starting professionally...")
+    # تشغيل سيرفر الويب الوهمي في الخلفية ليفتح البورت وتظهر العلامة الزرقاء
+    t = Thread(target=run_web)
+    t.start()
+    
+    print("Bot and Web server are starting successfully...")
     while True:
         try:
             bot.remove_webhook()
