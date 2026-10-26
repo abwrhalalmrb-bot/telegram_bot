@@ -20,7 +20,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "SMM Bot is running and active!"
+    return "SMM Pro Bot is running and active!"
 
 def run_web():
     port = int(os.environ.get("PORT", 8080))
@@ -54,6 +54,7 @@ def send_welcome(message):
         InlineKeyboardButton("🚀 رشق جميع منصات التواصل الاجتماعي (SMM)", callback_data="services")
     )
     
+    # أزرار التواصل المباشر بحسابك الشخصي
     row5_1 = InlineKeyboardButton("📞 التواصل مع الإدارة", url=f"https://t.me/{ADMIN_USERNAME}")
     row5_2 = InlineKeyboardButton("🛠️ الدعم الفني", url=f"https://t.me/{ADMIN_USERNAME}")
     markup.row(row5_1, row5_2)
@@ -72,7 +73,7 @@ def send_welcome(message):
         f"💎 **نبذة عنا:**\n"
         f"نحن بوابتك الموثوقة لخدمات الرشق المتكاملة لجميع وسائل التواصل الاجتماعي، وتوفير الأرقام الوهمية والافتراضية بأعلى جودة وضمانة حصرية.\n"
         f"🛡️ **موثق ومعتمد من شركة SMM العالمية لضمان السرعة والأمان!**\n\n"
-        f"👇 **اختر ما يناسبك من القائمة أدناه للبدء:**",
+        f"👇 **اختر ما يناسبك من القائمة أدناه:**",
         reply_markup=markup,
         parse_mode="Markdown"
     )
@@ -142,8 +143,8 @@ def handle_query(call):
         markup.add(InlineKeyboardButton("📞 التواصل مع الإدارة لتنفيذ الطلب فوراً", url=f"https://t.me/{ADMIN_USERNAME}"))
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
         bot.edit_message_text(
-            "🌟 **قسم الخدمات المميزة والمضمونة (SMM):**\n\n"
-            "لخدمتك بشكل أسرع وتنفيذ طلبك بدقة، اضغط على زر التواصل أدناه وتواصل مباشرة مع الإدارة ({ADMIN_NAME}) لإرسال الرابط والكمية المطلوبة وستتم خدمتك فوراً وبأفضل الأسعار!",
+            f"🌟 **قسم الخدمات المميزة والمصونة (SMM):**\n\n"
+            f"لخدمتك بشكل أسرع وتنفيذ طلبك بدقة، اضغط على زر التواصل أدناه وتواصل مباشرة مع الإدارة ({ADMIN_NAME}) لإرسال الرابط والكمية المطلوبة وستتم خدمتك فوراً وبأفضل الأسعار!",
             call.message.chat.id,
             call.message.message_id,
             reply_markup=markup,
