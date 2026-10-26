@@ -1,7 +1,8 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+import time
 
-# توكن البوت الخاص بك
+# إعدادات البوت والتوكن الخاص بك
 TOKEN = "8708102287:AAHavoWuCttSxEhhwQd1TMFN4nX_DdAwSE8"
 ADMIN_ID = 6815376911
 ADMIN_NAME = "اكرم Mohammed Hassan Al-Matari"
@@ -129,6 +130,11 @@ def handle_query(call):
         )
 
 if __name__ == '__main__':
-    print("Bot is starting successfully...")
-    bot.remove_webhook()
-    bot.infinity_polling(skip_pending=True)
+    print("Bot is starting cleanly...")
+    while True:
+        try:
+            bot.remove_webhook()
+            bot.infinity_polling(skip_pending=True, timeout=90, long_polling_timeout=60)
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            time.sleep(5)
