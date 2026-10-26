@@ -54,8 +54,9 @@ def send_welcome(message):
         InlineKeyboardButton("🚀 رشق جميع منصات التواصل الاجتماعي (SMM)", callback_data="services")
     )
     
-    row5_1 = InlineKeyboardButton("📞 التواصل مع الإدارة", url=f"https://t.me/{ADMIN_USERNAME}")
-    row5_2 = InlineKeyboardButton("🛠️ الدعم الفني", url=f"https://t.me/{ADMIN_USERNAME}")
+    # تحويل أزرار الإدارة والدعم لتفتح نافذة تفاعلية مضمونة 100%
+    row5_1 = InlineKeyboardButton("📞 التواصل مع الإدارة", callback_data="contact_admin")
+    row5_2 = InlineKeyboardButton("🛠️ الدعم الفني", callback_data="contact_admin")
     markup.row(row5_1, row5_2)
     
     markup.add(
@@ -103,7 +104,7 @@ def handle_query(call):
         balance = get_balance(user_id)
         markup = InlineKeyboardMarkup(row_width=1)
         markup.add(
-            InlineKeyboardButton("📤 إرسال إيصال التحويل للإدارة مباشرة", url=f"https://t.me/{ADMIN_USERNAME}"),
+            InlineKeyboardButton("📤 إرسال إيصال التحويل للإدارة", callback_data="contact_admin"),
             InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu")
         )
         text = (
@@ -112,9 +113,21 @@ def handle_query(call):
             f"💳 لشحن الرصيد عبر محفظة جيب (Jeeb):\n"
             f"رقم الحساب: {JEEB_WALLET}\n"
             f"اسم المستلم: {ADMIN_NAME}\n\n"
-            f"⚠️ بعد إتمام التحويل، اضغط على زر إرسال الإيصال وأرسل صورة التحويل مع الآيدي الخاص بك ليتم شحن رصيدك فوراً."
+            f"⚠️ بعد إتمام التحويل، اضغط على زر إرسال الإيصال وتواصل معنا لإرسال صورة التحويل ليتم شحن رصيدك فوراً."
         )
         bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=markup)
+
+    elif call.data == "contact_admin":
+        # نافذة تواصل مضمونة 100% تحول الزبون لحسابك الشخصي بدون أي مشاكل
+        markup = InlineKeyboardMarkup()
+        markup.add(InlineKeyboardButton("💬 اضغط هنا لمراسلة الإدارة مباشرة", url=f"https://t.me/{ADMIN_USERNAME}"))
+        markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
+        bot.edit_message_text(
+            f"📞 **تواصل مع الإدارة ({ADMIN_NAME}):**\n\n"
+            f"لطلب خدمات الرشق، الأرقام الوهمية، أو تأكيد شحن الرصيد، يرجى الضغط على الزر أدناه للانتقال مباشرة إلى حساب المسؤول:\n\n"
+            f"👤 المعرف: `@{ADMIN_USERNAME}`",
+            call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown"
+        )
 
     elif call.data == "account":
         user_id = call.from_user.id
@@ -126,17 +139,17 @@ def handle_query(call):
     elif call.data == "services":
         markup = InlineKeyboardMarkup(row_width=2)
         markup.add(
-            InlineKeyboardButton("📸 انستجرام (متابعين/لايكات)", callback_data="serv_insta"),
-            InlineKeyboardButton("🎵 تيك توك (متابعين/مشاهدات)", callback_data="serv_tiktok")
+            InlineKeyboardButton("📸 انستجرام (متابعين/لايكات)", callback_data="contact_admin"),
+            InlineKeyboardButton("🎵 تيك توك (متابعين/مشاهدات)", callback_data="contact_admin")
         )
         markup.add(
-            InlineKeyboardButton("✈️ تيليجرام (أعضاء/مشاهدات)", callback_data="serv_tele"),
-            InlineKeyboardButton("📘 فيسبوك ويوتيوب", callback_data="serv_fb_yt")
+            InlineKeyboardButton("✈️ تيليجرام (أعضاء/مشاهدات)", callback_data="contact_admin"),
+            InlineKeyboardButton("📘 فيسبوك ويوتيوب", callback_data="contact_admin")
         )
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
-        bot.edit_message_text("🚀 قسم رشق وسائل التواصل الاجتماعي (موثق SMM):\nاختر المنصة المطلوبة لتنفيذ طلبك الفوري:", call.message.chat.id, call.message.message_id, reply_markup=markup)
+        bot.edit_message_text("🚀 قسم رشق وسائل التواصل الاجتماعي (موثق SMM):\nاختر المنصة المطلوبة للتواصل الفوري وتنفيذ الطلب:", call.message.chat.id, call.message.message_id, reply_markup=markup)
 
-    elif call.data in ["buy_number", "offers_wa", "offers_tg", "most_used", "help", "serv_insta", "serv_tiktok", "serv_tele", "serv_fb_yt"]:
+    elif call.data in ["buy_number", "offers_wa", "offers_tg", "most_used", "help"]:
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("📞 التواصل مع الإدارة لتنفيذ الطلب فوراً", url=f"https://t.me/{ADMIN_USERNAME}"))
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
@@ -167,8 +180,8 @@ def handle_query(call):
             InlineKeyboardButton("🚀 رشق جميع منصات التواصل الاجتماعي (SMM)", callback_data="services")
         )
         
-        row5_1 = InlineKeyboardButton("📞 التواصل مع الإدارة", url=f"https://t.me/{ADMIN_USERNAME}")
-        row5_2 = InlineKeyboardButton("🛠️ الدعم الفني", url=f"https://t.me/{ADMIN_USERNAME}")
+        row5_1 = InlineKeyboardButton("📞 التواصل مع الإدارة", callback_data="contact_admin")
+        row5_2 = InlineKeyboardButton("🛠️ الدعم الفني", callback_data="contact_admin")
         markup.row(row5_1, row5_2)
         
         markup.add(
