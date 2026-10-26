@@ -54,7 +54,6 @@ def send_welcome(message):
         InlineKeyboardButton("🚀 رشق جميع منصات التواصل الاجتماعي (SMM)", callback_data="services")
     )
     
-    # تحويل أزرار الإدارة والدعم لتفتح نافذة تفاعلية مضمونة 100%
     row5_1 = InlineKeyboardButton("📞 التواصل مع الإدارة", callback_data="contact_admin")
     row5_2 = InlineKeyboardButton("🛠️ الدعم الفني", callback_data="contact_admin")
     markup.row(row5_1, row5_2)
@@ -118,14 +117,14 @@ def handle_query(call):
         bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=markup)
 
     elif call.data == "contact_admin":
-        # نافذة تواصل مضمونة 100% تحول الزبون لحسابك الشخصي بدون أي مشاكل
+        # استخدام رابط tg:// الداخلي المضمون 100% لتجنب أي أخطاء في اسم المستخدم
         markup = InlineKeyboardMarkup()
-        markup.add(InlineKeyboardButton("💬 اضغط هنا لمراسلة الإدارة مباشرة", url=f"https://t.me/{ADMIN_USERNAME}"))
+        markup.add(InlineKeyboardButton("💬 اضغط هنا لمراسلة الإدارة مباشرة", url=f"tg://resolve?domain={ADMIN_USERNAME}"))
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
         bot.edit_message_text(
             f"📞 **تواصل مع الإدارة ({ADMIN_NAME}):**\n\n"
             f"لطلب خدمات الرشق، الأرقام الوهمية، أو تأكيد شحن الرصيد، يرجى الضغط على الزر أدناه للانتقال مباشرة إلى حساب المسؤول:\n\n"
-            f"👤 المعرف: `@{ADMIN_USERNAME}`",
+            f"👤 المعرف: @{ADMIN_USERNAME}",
             call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown"
         )
 
@@ -151,7 +150,7 @@ def handle_query(call):
 
     elif call.data in ["buy_number", "offers_wa", "offers_tg", "most_used", "help"]:
         markup = InlineKeyboardMarkup()
-        markup.add(InlineKeyboardButton("📞 التواصل مع الإدارة لتنفيذ الطلب فوراً", url=f"https://t.me/{ADMIN_USERNAME}"))
+        markup.add(InlineKeyboardButton("📞 التواصل مع الإدارة لتنفيذ الطلب فوراً", url=f"tg://resolve?domain={ADMIN_USERNAME}"))
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
         
         msg_text = (
