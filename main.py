@@ -65,16 +65,15 @@ def send_welcome(message):
     
     bot.send_message(
         message.chat.id,
-        f"👤 **الآيدي:** `{user_id}`\n"
-        f"💙 **رصيدك الحالي:** `{balance:.2f} $`\n\n"
+        f"👤 الآيدي: {user_id}\n"
+        f"💙 رصيدك الحالي: {balance:.2f} $\n\n"
         f"━━━━━━━━━━━━━━━\n\n"
-        f"🔥 **أهلاً بك في منصتك الاحترافية الأولى والأسرع!**\n\n"
-        f"💎 **نبذة عنا:**\n"
+        f"🔥 أهلاً بك في منصتك الاحترافية الأولى والأسرع!\n\n"
+        f"💎 نبذة عنا:\n"
         f"نحن بوابتك الموثوقة لخدمات الرشق المتكاملة لجميع وسائل التواصل الاجتماعي، وتوفير الأرقام الوهمية والافتراضية بأعلى جودة وضمانة حصرية.\n"
-        f"🛡️ **موثق ومعتمد من شركة SMM العالمية لضمان السرعة والأمان!**\n\n"
-        f"👇 **اختر ما يناسبك من القائمة أدناه:**",
-        reply_markup=markup,
-        parse_mode="Markdown"
+        f"🛡️ موثق ومعتمد من شركة SMM العالمية لضمان السرعة والأمان!\n\n"
+        f"👇 اختر ما يناسبك من القائمة أدناه:",
+        reply_markup=markup
     )
 
 @bot.message_handler(commands=['addbalance'])
@@ -85,15 +84,15 @@ def add_balance_cmd(message):
     
     args = message.text.split()
     if len(args) != 3:
-        bot.reply_to(message, "⚠️ خطأ! استخدم الصيغة الصحيحة:\n`/addbalance user_id amount`", parse_mode="Markdown")
+        bot.reply_to(message, "⚠️ خطأ! استخدم الصيغة الصحيحة:\n/addbalance user_id amount")
         return
     
     try:
         target_user_id = int(args[1])
         amount = float(args[2])
         update_balance(target_user_id, amount)
-        bot.reply_to(message, f"✅ تم بنجاح إضافة `{amount}$` إلى رصيد المستخدم `{target_user_id}`.", parse_mode="Markdown")
-        bot.send_message(target_user_id, f"🎉 تم شحن رصيدك بمبلغ `{amount}$` بنجاح بواسطة الإدارة ({ADMIN_NAME})!", parse_mode="Markdown")
+        bot.reply_to(message, f"✅ تم بنجاح إضافة {amount}$ إلى رصيد المستخدم {target_user_id}.")
+        bot.send_message(target_user_id, f"🎉 تم شحن رصيدك بمبلغ {amount}$ بنجاح بواسطة الإدارة ({ADMIN_NAME})!")
     except ValueError:
         bot.reply_to(message, "⚠️ تأكد من أن الآيدي والمبلغ أرقام صحيحة.")
 
@@ -108,21 +107,21 @@ def handle_query(call):
             InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu")
         )
         text = (
-            f"💰 **حساب المحفظة الرقمية والشحن:**\n\n"
-            f"🔹 رصيدك الحالي: `{balance:.2f}$`\n\n"
-            f"💳 **لشحن الرصيد عبر محفظة جيب (Jeeb):**\n"
-            f"رقم الحساب: `{JEEB_WALLET}`\n"
-            f"اسم المستلم: `{ADMIN_NAME}`\n\n"
+            f"💰 حساب المحفظة الرقمية والشحن:\n\n"
+            f"🔹 رصيدك الحالي: {balance:.2f}$\n\n"
+            f"💳 لشحن الرصيد عبر محفظة جيب (Jeeb):\n"
+            f"رقم الحساب: {JEEB_WALLET}\n"
+            f"اسم المستلم: {ADMIN_NAME}\n\n"
             f"⚠️ بعد إتمام التحويل، اضغط على زر إرسال الإيصال وأرسل صورة التحويل مع الآيدي الخاص بك ليتم شحن رصيدك فوراً."
         )
-        bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
+        bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=markup)
 
     elif call.data == "account":
         user_id = call.from_user.id
         balance = get_balance(user_id)
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
-        bot.edit_message_text(f"👤 **معلومات حسابك الشخصي:**\n\n🆔 الآيدي الخاص بك: `{user_id}`\n💰 الرصيد المتاح: `{balance:.2f}$`\n👨‍💼 المسؤول: `{ADMIN_NAME}`", call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
+        bot.edit_message_text(f"👤 معلومات حسابك الشخصي:\n\n🆔 الآيدي الخاص بك: {user_id}\n💰 الرصيد المتاح: {balance:.2f}$\n👨‍💼 المسؤول: {ADMIN_NAME}", call.message.chat.id, call.message.message_id, reply_markup=markup)
 
     elif call.data == "services":
         markup = InlineKeyboardMarkup(row_width=2)
@@ -135,19 +134,18 @@ def handle_query(call):
             InlineKeyboardButton("📘 فيسبوك ويوتيوب", callback_data="serv_fb_yt")
         )
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
-        bot.edit_message_text("🚀 **قسـم رشق وسائل التواصل الاجتماعي (موثق SMM):**\nاختر المنصة المطلوبة لتنفيذ طلبك الفوري:", call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
+        bot.edit_message_text("🚀 قسم رشق وسائل التواصل الاجتماعي (موثق SMM):\nاختر المنصة المطلوبة لتنفيذ طلبك الفوري:", call.message.chat.id, call.message.message_id, reply_markup=markup)
 
     elif call.data in ["buy_number", "offers_wa", "offers_tg", "most_used", "help", "serv_insta", "serv_tiktok", "serv_tele", "serv_fb_yt"]:
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("📞 التواصل مع الإدارة لتنفيذ الطلب فوراً", url=f"https://t.me/{ADMIN_USERNAME}"))
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
         
-        # تم تصحيح صياغة النص هنا لتعمل بشكل نظامي ودون أي أخطاء
         msg_text = (
-            "🌟 **قسم الخدمات المميزة والمضمونة (SMM):**\n\n"
+            f"🌟 قسم الخدمات المميزة والمضمونة (SMM):\n\n"
             f"لخدمتك بشكل أسرع وتنفيذ طلبك بدقة، اضغط على زر التواصل أدناه وتواصل مباشرة مع الإدارة ({ADMIN_NAME}) لإرسال الرابط والكمية المطلوبة وستتم خدمتك فوراً وبأفضل الأسعار!"
         )
-        bot.edit_message_text(msg_text, call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
+        bot.edit_message_text(msg_text, call.message.chat.id, call.message.message_id, reply_markup=markup)
 
     elif call.data == "main_menu":
         user_id = call.from_user.id
@@ -179,18 +177,17 @@ def handle_query(call):
         )
         
         bot.edit_message_text(
-            f"👤 **الآيدي:** `{user_id}`\n"
-            f"💙 **رصيدك الحالي:** `{balance:.2f} $`\n\n"
+            f"👤 الآيدي: {user_id}\n"
+            f"💙 رصيدك الحالي: {balance:.2f} $\n\n"
             f"━━━━━━━━━━━━━━━\n\n"
-            f"🔥 **أهلاً بك في منصتك الاحترافية الأولى والأسرع!**\n\n"
-            f"💎 **نبذة عنا:**\n"
+            f"🔥 أهلاً بك في منصتك الاحترافية الأولى والأسرع!\n\n"
+            f"💎 نبذة عنا:\n"
             f"نحن بوابتك الموثوقة لخدمات الرشق المتكاملة لجميع وسائل التواصل الاجتماعي، وتوفير الأرقام الوهمية والافتراضية بأعلى جودة وضمانة حصرية.\n"
-            f"🛡️ **موثق ومعتمد من شركة SMM العالمية لضمان السرعة والأمان!**\n\n"
-            f"👇 **اختر ما يناسبك من القائمة أدناه:**",
+            f"🛡️ موثق ومعتمد من شركة SMM العالمية لضمان السرعة والأمان!\n\n"
+            f"👇 اختر ما يناسبك من القائمة أدناه:",
             call.message.chat.id, 
             call.message.message_id, 
-            reply_markup=markup,
-            parse_mode="Markdown"
+            reply_markup=markup
         )
 
 if __name__ == '__main__':
