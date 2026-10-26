@@ -1,8 +1,8 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# إعدادات البوت الأساسية
-TOKEN = "8708102287:AAH2BvgdCgqfV6Nl9dJ6X19EY0XCR5V_AYk"
+# إعدادات البوت والتوكن الجديد المدمج بنجاح
+TOKEN = "8708102287:AAHavoWuCttSxEhhwQd1TMFN4nX_DdAwSE8"
 ADMIN_ID = 6815376911
 ADMIN_NAME = "اكرم Mohammed Hassan Al-Matari"
 JEEB_WALLET = "780089588"
@@ -20,7 +20,7 @@ def update_balance(user_id, amount):
 def send_welcome(message):
     markup = InlineKeyboardMarkup(row_width=2)
     markup.add(
-        InlineKeyboardButton("🛒 خدمات الرشق", callback_data="services"),
+        InlineKeyboardButton("🛒 خدمات الرشق الرقمية", callback_data="services"),
         InlineKeyboardButton("💰 محفظتي وشحن الرصيد", callback_data="wallet")
     )
     markup.add(
@@ -111,7 +111,7 @@ def handle_query(call):
     elif call.data == "main_menu":
         markup = InlineKeyboardMarkup(row_width=2)
         markup.add(
-            InlineKeyboardButton("🛒 خدمات الرشق", callback_data="services"),
+            InlineKeyboardButton("🛒 خدمات الرشق الرقمية", callback_data="services"),
             InlineKeyboardButton("💰 محفظتي وشحن الرصيد", callback_data="wallet")
         )
         markup.add(
@@ -129,5 +129,5 @@ def handle_query(call):
         )
 
 if __name__ == '__main__':
-    print("Bot is starting successfully...")
+    print("Bot is starting successfully with the new token...")
     bot.infinity_polling(none_stop=True)
