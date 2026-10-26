@@ -54,7 +54,6 @@ def send_welcome(message):
         InlineKeyboardButton("🚀 رشق جميع منصات التواصل الاجتماعي (SMM)", callback_data="services")
     )
     
-    # أزرار التواصل المباشر بحسابك الشخصي
     row5_1 = InlineKeyboardButton("📞 التواصل مع الإدارة", url=f"https://t.me/{ADMIN_USERNAME}")
     row5_2 = InlineKeyboardButton("🛠️ الدعم الفني", url=f"https://t.me/{ADMIN_USERNAME}")
     markup.row(row5_1, row5_2)
@@ -142,14 +141,13 @@ def handle_query(call):
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("📞 التواصل مع الإدارة لتنفيذ الطلب فوراً", url=f"https://t.me/{ADMIN_USERNAME}"))
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
-        bot.edit_message_text(
-            f"🌟 **قسم الخدمات المميزة والمصونة (SMM):**\n\n"
-            f"لخدمتك بشكل أسرع وتنفيذ طلبك بدقة، اضغط على زر التواصل أدناه وتواصل مباشرة مع الإدارة ({ADMIN_NAME}) لإرسال الرابط والكمية المطلوبة وستتم خدمتك فوراً وبأفضل الأسعار!",
-            call.message.chat.id,
-            call.message.message_id,
-            reply_markup=markup,
-            parse_mode="Markdown"
+        
+        # تم تصحيح صياغة النص هنا لتعمل بشكل نظامي ودون أي أخطاء
+        msg_text = (
+            "🌟 **قسم الخدمات المميزة والمضمونة (SMM):**\n\n"
+            f"لخدمتك بشكل أسرع وتنفيذ طلبك بدقة، اضغط على زر التواصل أدناه وتواصل مباشرة مع الإدارة ({ADMIN_NAME}) لإرسال الرابط والكمية المطلوبة وستتم خدمتك فوراً وبأفضل الأسعار!"
         )
+        bot.edit_message_text(msg_text, call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
 
     elif call.data == "main_menu":
         user_id = call.from_user.id
