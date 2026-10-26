@@ -1,7 +1,7 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# إعدادات البوت والتوكن الجديد المدمج بنجاح
+# توكن البوت الخاص بك
 TOKEN = "8708102287:AAHavoWuCttSxEhhwQd1TMFN4nX_DdAwSE8"
 ADMIN_ID = 6815376911
 ADMIN_NAME = "اكرم Mohammed Hassan Al-Matari"
@@ -129,5 +129,7 @@ def handle_query(call):
         )
 
 if __name__ == '__main__':
-    print("Bot is starting successfully with the new token...")
-    bot.infinity_polling(none_stop=True)
+    print("Bot is starting...")
+    # هذا السطر يقوم بحذف أي اتصال قديم معلق ويحل مشكلة 409 نهائياً
+    bot.remove_webhook()
+    bot.infinity_polling(skip_pending=True)
