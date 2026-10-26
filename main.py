@@ -129,7 +129,6 @@ def handle_query(call):
         )
 
 if __name__ == '__main__':
-    print("Bot is starting...")
-    # هذا السطر يقوم بحذف أي اتصال قديم معلق ويحل مشكلة 409 نهائياً
+    print("Bot is starting successfully...")
     bot.remove_webhook()
     bot.infinity_polling(skip_pending=True)
