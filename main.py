@@ -40,7 +40,6 @@ def get_balance(user_id):
 def update_balance(user_id, amount):
     user_balances[user_id] = get_balance(user_id) + amount
 
-# دالة لجلب الخدمات من الموقع عبر الـ API
 def get_smm_services():
     try:
         response = requests.post(API_URL, data={
@@ -141,7 +140,7 @@ def handle_query(call):
 
     elif call.data == "account":
         user_id = call.from_user.id
-        balance_yer = get_balance(user_id) * EXCHANGE_Rate if 'EXCHANGE_Rate' in globals() else get_balance(user_id) * EXCHANGE_RATE
+        balance_yer = get_balance(user_id) * EXCHANGE_RATE
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
         bot.edit_message_text(f"👤 معلومات حسابك الشخصي:\n\n🆔 الآيدي الخاص بك: {user_id}\n💰 الرصيد المتاح: {balance_yer:,.0f} ريال يمني\n👨‍💼 المسؤول: {ADMIN_NAME}", call.message.chat.id, call.message.message_id, reply_markup=markup)
@@ -151,12 +150,10 @@ def handle_query(call):
         services = get_smm_services()
         
         if services and isinstance(services, list):
-            # نعرض أول 15 خدمة كمثال مباشر مع حساب الأسعار بالريال اليمني
             text = "🚀 **أبرز الخدمات المتاحة حالياً من الموقع (محدثة تلقائياً):**\n\n"
             markup = InlineKeyboardMarkup(row_width=1)
             
-            count = 0
-            for s in services[:15]:  # عرض عينة أولية لتجنب طول الرسالة
+            for s in services[:15]:
                 s_id = s.get('service')
                 s_name = s.get('name')
                 s_rate_usd = float(s.get('rate', 0))
@@ -170,12 +167,11 @@ def handle_query(call):
             try:
                 bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
             except Exception:
-                # في حال كانت الرسالة طويلة جداً يتم عرض خيار التواصل المباشر
                 bot.edit_message_text("✅ تم الاتصال بموقع SMMKings بنجاح وجلب كافة الخدمات.\n\nلطلب أي خدمة فوراً، تواصل مع الإدارة مباشرة:", call.message.chat.id, call.message.message_id, reply_markup=markup)
         else:
             markup = InlineKeyboardMarkup()
             markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
-            bot.edit_message_text("⚠️ تعذر جلب الخدمات حالياً من الـ API، يجدر التأكد من المفتاح أو التواصل مع الدعم الفني.", call.message.chat.id, call.message.message_id, reply_markup=markup)
+            bot.edit_message_text("⚠️ تعذر جلب الخدمات حالياً من الـ API، تأكد من الاتصال أو المفتاح.", call.message.chat.id, call.message.message_id, reply_markup=markup)
 
     elif call.data in ["serv_whatsapp", "serv_telegram", "buy_number", "offers_whatsapp", "offers_telegram", "most_used", "help"]:
         markup = InlineKeyboardMarkup()
