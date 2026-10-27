@@ -22,7 +22,7 @@ EXCHANGE_RATE = 800
 
 bot = telebot.TeleBot(TOKEN)
 user_balances = {}
-user_states = {}  # حفظ حالة المستخدم لتوقع العدد المطلوب
+user_states = {}
 
 # سيرفر الويب الخفيف لإبقاء البوت نشطاً على Render
 app = Flask('')
@@ -49,6 +49,53 @@ def fetch_services():
     except Exception as e:
         print(f"API Error: {e}")
     return []
+
+# دالة ذكية لتحويل الأسماء الإنجليزية إلى أسماء عربية فخمة وواضحة للزبون
+def translate_service_name(name, category):
+    name_lower = name.lower()
+    
+    if category == "instagram":
+        if "follower" in name_lower:
+            return "📸 متابعين انستجرام (حقيقي وضمان)"
+        elif "like" in name_lower:
+            return "❤️ لايكات انستجرام تفاعل سريع"
+        elif "view" in name_lower:
+            return "👁️ مشاهدات ريلز/فيديو انستجرام"
+        else:
+            return "✨ خدمة انستجرام مميزة"
+            
+    elif category == "facebook":
+        if "follower" in name_lower:
+            return "📘 متابعين فيسبوك (ملفات/صفحات)"
+        elif "like" in name_lower:
+            return "👍 لايكات منشورات فيسبوك"
+        elif "view" in name_lower:
+            return "▶️ مشاهدات فيديو فيسبوك"
+        else:
+            return "✨ خدمة فيسبوك مميزة"
+            
+    elif category == "tiktok":
+        if "follower" in name_lower:
+            return "🎵 متابعين تيك توك نشطين"
+        elif "like" in name_lower:
+            return "❤️ لايكات تيك توك (قلوب)"
+        elif "view" in name_lower:
+            return "👁️ مشاهدات تيك توك صاروخية"
+        else:
+            return "✨ خدمة تيك توك مميزة"
+            
+    elif category == "telegram":
+        if "member" in name_lower or "subscriber" in name_lower:
+            return "✈️ أعضاء تيليجرام (قنوات/مجموعات)"
+        elif "view" in name_lower:
+            return "👁️ مشاهدات منشورات تيليجرام"
+        else:
+            return "✨ خدمة تيليجرام مميزة"
+            
+    elif category == "whatsapp":
+        return "💬 خدمات وأرقام وتفاعل واتساب"
+        
+    return f"🌟 {name[:35]}..."
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -138,22 +185,20 @@ def handle_query(call):
             InlineKeyboardButton("🌐 باقي الخدمات العامة", callback_data="cat_all")
         )
         markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
-        bot.edit_message_text("🚀 **اختر المنصة المطلوبة لتحديد الكمية وحساب السعر تلقائياً:**", call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
+        bot.edit_message_text("🚀 **اختر المنصة المطلوبة لعرض الخدمات باللغة العربية:**", call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
 
     elif call.data.startswith("cat_"):
         platform_key = call.data.split("_")[1]
-        bot.edit_message_text("🔄 جاري تحميل الخدمات...", call.message.chat.id, call.message.message_id)
+        bot.edit_message_text("🔄 جاري تحميل وتعرّيب الخدمات...", call.message.chat.id, call.message.message_id)
         
         services = fetch_services()
-        markup = InlineKeyboardMarkup()
+        markup = InlineKeyboardMarkup(row_width=1)
         markup.add(InlineKeyboardButton("🔙 رجوع لأقسام المنصات", callback_data="services"))
         
         if services and isinstance(services, list):
-            text = "📋 **اختر الخدمة المطلوبة بالضغط عليها، ثم أرسل العدد الذي تريده في رسالة:**\n\n"
             count = 0
             for s in services:
                 name = s.get('name', '').lower()
-                orig_name = s.get('name', 'خدمة رقمية')
                 s_id = s.get('service')
                 
                 matched = False
@@ -171,13 +216,14 @@ def handle_query(call):
                     matched = True
                 
                 if matched and count < 8:
-                    markup.add(InlineKeyboardButton(f"📌 {orig_name[:40]}...", callback_data=f"sel_{s_id}"))
+                    arabic_name = translate_service_name(s.get('name'), platform_key)
+                    markup.add(InlineKeyboardButton(arabic_name, callback_data=f"sel_{s_id}"))
                     count += 1
             
             if count == 0:
-                text = "⚠️ عذراً، لا توجد خدمات متاحة حالياً في هذا القسم."
-            
-            bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=markup)
+                bot.edit_message_text("⚠️ عذراً، لا توجد خدمات متاحة حالياً في هذا القسم.", call.message.chat.id, call.message.message_id, reply_markup=markup)
+            else:
+                bot.edit_message_text("📋 **اختر الخدمة المطلوبة بالضغط عليها، ثم أرسل العدد الذي تريده في رسالة:**", call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
         else:
             bot.edit_message_text("⚠️ تعذر جلب الخدمات حالياً.", call.message.chat.id, call.message.message_id, reply_markup=markup)
 
@@ -189,7 +235,7 @@ def handle_query(call):
         markup.add(InlineKeyboardButton("🔙 إلغاء والرجوع", callback_data="services"))
         
         bot.edit_message_text(
-            f"✏️ **أنت الآن بصدد طلب الخدمة رقم: `{service_id}`**\n\n"
+            f"✏️ **أنت الآن تطلب الخدمة المحددة رقم: `{service_id}`**\n\n"
             f"📥 **الرجاء إرسال العدد المطلوب في رسالة (مثلاً: 200 أو 500 أو 1000):**",
             call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown"
         )
@@ -249,7 +295,7 @@ def handle_query(call):
             reply_markup=markup
         )
 
-# استقبال العدد الذي يرسله الزبون وحساب السعر التلقائي
+# استقبال العدد المطلوب وحساب السعر بالريال اليمني
 @bot.message_handler(func=lambda message: message.from_user.id in user_states)
 def process_quantity(message):
     user_id = message.from_user.id
@@ -268,7 +314,6 @@ def process_quantity(message):
     
     service_id = state['service_id']
     
-    # جلب تفاصيل الخدمة من الموقع لحساب السعر بدقة
     services = fetch_services()
     selected_service = None
     for s in services:
@@ -277,14 +322,13 @@ def process_quantity(message):
             break
     
     if not selected_service:
-        bot.reply_to(message, "⚠️ عذراً، هذه الخدمة غير متوفرة حالياً. حاول اختيار خدمة أخرى.")
+        bot.reply_to(message, "⚠️ عذراً، هذه الخدمة غير متوفرة حالياً.")
         user_states.pop(user_id, None)
         return
     
-    service_name = selected_service.get('name', 'خدمة رقمية')
+    orig_name = selected_service.get('name', 'خدمة رقمية')
     rate_usd_per_1000 = float(selected_service.get('rate', 0))
     
-    # حساب السعر الإجمالي للكمية المطلوبة بالدولار ثم تحويله للريال اليمني
     total_price_usd = (rate_usd_per_1000 / 1000) * quantity
     total_price_yer = total_price_usd * EXCHANGE_RATE
     
@@ -297,11 +341,11 @@ def process_quantity(message):
     bot.send_message(
         message.chat.id,
         f"✅ **تم حساب تفاصيل طلبك بنجاح:**\n\n"
-        f"📦 **اسم المنتج:** {service_name}\n"
+        f"📦 **اسم المنتج:** {orig_name}\n"
         f"🆔 **رقم الخدمة:** `{service_id}`\n"
         f"🔢 **العدد المطلوب:** `{quantity:,}`\n"
         f"💰 **السعر الإجمالي:** `{total_price_yer:,.0f} ريال يمني`\n"
-        f"🛡️ **الضمان:** ضمان سنة كاملة / جودة عالية\n\n"
+        f"🛡️ **الضمان:** ضمان سنة كاملة / جودة عالية وضمان\n\n"
         f"👇 لإتمام الطلب، اضغط على زر المراسلة أدناه وأرسل رابط الحساب مع إيصال الدفع:",
         reply_markup=markup,
         parse_mode="Markdown"
@@ -311,7 +355,7 @@ if __name__ == '__main__':
     t = Thread(target=run_web)
     t.start()
     
-    print("SMM Pro Custom Quantity Bot is starting successfully...")
+    print("SMM Pro Arabic Custom Bot is starting successfully...")
     while True:
         try:
             bot.remove_webhook()
